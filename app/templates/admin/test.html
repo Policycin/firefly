@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="{{ url_for('static',filename='base/images/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='admin/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fonts/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='ionicons/css/ionicons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='admin/dist/css/AdminLTE.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='admin/dist/css/skins/_all-skins.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='admin/plugins/datepicker/datepicker3.css') }}">
+    <style>
+        * {
+            font-family: "Microsoft YaHei";
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+    {% block css %}{% endblock %}
+
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row " style="margin-top: 10px">
+        <ul>
+            {% for foo in index_list %}
+                <li>{{ foo }}：这是列表内容~~</li>
+            {% endfor %}
+        </ul>
+        <nav aria-label="Page navigation" class="pull-right">
+            <ul class="pagination">
+                {{ html|safe }}
+            </ul>
+        </nav>
+    </div>
+</div>
+<script src="{{ url_for('static',filename='admin/plugins/jQuery/jQuery-2.2.0.min.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/plugins/fastclick/fastclick.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/dist/js/app.min.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/dist/js/demo.js') }}"></script>
+<script src="//cdn.bootcss.com/holder/2.9.4/holder.min.js"></script>
+<script src="{{ url_for('static',filename='admin/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
+<script src="{{ url_for('static',filename='admin/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js') }}"
+        charset="UTF-8"></script>
+{% block js %}{% endblock %}
+</body>
+</html>
