@@ -419,3 +419,49 @@ class CmpFileForm(FlaskForm):
 
         }
     )
+
+
+class NoticeForm(FlaskForm):
+    content = StringField(
+        label='公告',
+        validators=[
+            DataRequired("请输入公告信息")
+        ],
+        description="公告",
+        render_kw={
+            'class': "form-control",
+            'id': 'input_name',
+            'placeholder': '请输入公告信息！'
+        }
+
+    )
+    cho=[('是','是'),('否','否')]
+    activation = SelectField(
+        label="是否生效",
+        validators=[
+            DataRequired('请选择是否生效')
+        ],
+        description='是否生效',
+        coerce=str,
+        choices=cho,
+        render_kw={
+            "class": "form-control", "placeholder": "请选择标签分类"
+        }
+    )
+    # addtime = StringField(
+    #     label='添加时间',
+    #     validators=[
+    #         DataRequired('请选择添加时间')
+    #     ],
+    #     description='添加时间',
+    #     render_kw={
+    #         'class': "form-control", 'placeholder': "请选择添加时间！", "id": "input_release_time3"
+    #     }
+    # )
+    submit = SubmitField(
+        '编辑',
+        render_kw={
+            'class': 'btn btn-primary',
+
+        }
+    )

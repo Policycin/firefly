@@ -1,6 +1,6 @@
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
-from .forms import LoginForm, TagForm, PwdForm,SoureFileForm , CmpFileForm
+from .forms import LoginForm, TagForm, PwdForm,SoureFileForm , CmpFileForm,NoticeForm
 from pymongo import MongoClient, DESCENDING
 from ..models import verify_password
 from flask_login import login_user, logout_user, login_required, current_user
@@ -268,7 +268,7 @@ def cmpfile_add():
             'publishDate':data['publishDate'],
             'addtime':datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             'content':data['content'].replace(" ","").strip(),
-            'tag':data['tag_id'].replace(" ","").strip(),
+            'tag':data['tag_id'],
             'fileWebsiteUrl':data['fileWebsiteUrl'].replace(" ","").strip(),
             'abolitionDate':data['abolitionDate'],
             'fileLocalUrl':data['fileLocalUrl'].replace(" ","").strip(),
@@ -353,16 +353,56 @@ def cmpfile_edit(id=None):
 def notice_list(page=None):
     if page==None:
         page=1
-    return render_template('admin/notice_list.html')
-@admin.route('/notice/add/<id>',methods=['GET','POST'])
+    notice = db.Notice.find().sort('_id', -1)
+    count = notice.count()
+    paper_obj = Pagination(request.args.get("page", page), count, request.path, request.args, per_page_count=10)
+    html = paper_obj.page_html()
+    param = []
+    for v in range(count):
+        param.append([v + 1, notice[v].get("_id"), notice[v].get("content"),notice[v].get("activation"),notice[v].get("optuser"),notice[v].get("addtime")])
+    index_list = param[paper_obj.start:paper_obj.end]
+    return render_template("admin/notice_list.html", index_list=index_list, html=html)
+@admin.route('/notice/add/',methods=['GET','POST'])
 def notice_add():
-    return render_template('admin/notice_add.html')
+    form = NoticeForm()
+    if form.validate_on_submit():
+        data = form.data
+        notice = {
+            'content': data['content'].replace(" ","").strip(),
+            'addtime': datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            'optuser': session['admin'],
+            'activation': data['activation']
+        }
+        db.Notice.insert(notice)
+        flash("添加成功", 'ok')
+        return redirect(url_for('admin.notice_list', page=1))
+    return render_template('admin/notice_add.html',form=form)
+
 @admin.route('/notice/del/<id>',methods=['GET'])
 def notice_del(id=None):
-    return redirect('admin.notice_list')
+    db.Notice.remove({"_id": ObjectId(id)})
+    flash("公告删除成功",'del')
+    return redirect(url_for('admin.notice_list',page=1))
 @admin.route('/notice/edit/<id>',methods=['GET','POST'])
 def notice_edit(id=None):
-    return render_template('admin/notice_edit.html')
+    form=NoticeForm()
+    notice=db.Notice.find_one({"_id":ObjectId(id)})
+    if request.method=='GET':
+        form.activation.data=notice['activation']
+    if form.validate_on_submit():
+        data = form.data
+        newnotice = {
+            'content':data['content'],
+            'activation':data['activation']
+        }
+
+        db.Notice.update(notice, {'$set': newnotice})
+        flash("更新成功", 'ok')
+        return redirect(url_for('admin.notice_edit', id=id))
+    return render_template("admin/notice_edit.html", form=form, notice=notice)
+
+
+
 
 
 

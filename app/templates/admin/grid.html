@@ -79,12 +79,12 @@
         </a>
         <ul class="treeview-menu">
             <li id="g-5-1">
-                <a href="#">
+                <a href="{{ url_for('admin.notice_add') }}">
                     <i class="fa fa-circle-o"></i> 添加公告
                 </a>
             </li>
             <li id="g-5-2">
-                <a href="#">
+                <a href="{{ url_for('admin.notice_list',page=1) }}">
                     <i class="fa fa-circle-o"></i> 公告列表
                 </a>
             </li>
