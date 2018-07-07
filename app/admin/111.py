@@ -113,3 +113,231 @@ class Pagination(object):
         page_html_list.append(last_page)
 
         return ''.join(page_html_list)
+
+'''
+totalFileCount = 0
+            totalRowCount = 0
+            fileNo2 = request.values.get("fileNo2")
+            app.logger.info("fileNo2=%s" % fileNo2)
+            sqlwhereOne = {}
+            curDbName.statements.remove(sqlwhereOne)
+            sqlwhereOne = {'fileNo': fileNo2}
+            entities2 = curDbName.statements_all.find(sqlwhereOne)
+            entities2Count = entities2.count()
+            for x in range(entities2Count):
+                entitiesMap = entities2[x]
+                curDbName.statements.insert_one(entitiesMap)
+#----------------------------------------------------------
+            if entities2Count > 1:
+                patternQiantou = re.compile(r'(（).*?牵头.*?(）)')
+                patternFuze = re.compile(r'(（).*?负责.*?(）)')
+
+                weightData = {}
+                sqlwhereWeight = {'weight': {'$exists': 1}}
+                entitiesWeight = curDbName.statements.find(sqlwhereWeight)
+                for doc in entitiesWeight:
+                    keyText = doc['text']
+                    keyText = keyText.replace('20180308', '')
+                    weightData[keyText] = doc['weight']
+                # app.logger.info(weightData)
+
+                sqlwhere = {}
+                if len(repositoryID) > 2:
+                    sqlwhere = {'_id': ObjectId(repositoryID)}
+                else:
+                    fileName = request.values.get("fileName")
+                    fileNo = request.values.get("fileNo")
+                    publisherCityName = request.values.get("publisherCityName")
+                    if fileName is not None and len(fileName.strip()) > 0:
+                        sqlfileName = {'fileName': re.compile(fileName)}
+                        sqlwhere.update(sqlfileName)
+                    if fileNo is not None and len(fileNo.strip()) > 0:
+                        sqlfileNo = {'fileNo': re.compile(fileNo)}
+                        sqlwhere.update(sqlfileNo)
+                    if publisherCityName is not None and len(publisherCityName.strip()) > 0:
+                        sqlTmp = {'publisherCityName': re.compile(publisherCityName)}
+                        sqlwhere.update(sqlTmp)
+
+                    publishtime1 = request.values.get("publishtime1")
+                    publishtime2 = request.values.get("publishtime2")
+                    if publishtime1 is not None and len(publishtime1.strip()) > 0:
+                        sqlanswer = {'publishDate': {'$gte': publishtime1}}
+                        sqlwhere.update(sqlanswer)
+                    else:
+                        publishtime1 = ""
+                    if publishtime2 is not None and len(publishtime2.strip()) > 0:
+                        if len(publishtime1) > 0:
+                            sqlanswer = {'publishDate': {'$gte': publishtime1, '$lt': publishtime2}}
+                        else:
+                            sqlanswer = {'publishDate': {'$lt': publishtime2}}
+                        sqlwhere.update(sqlanswer)
+
+                app.logger.info(sqlwhere)
+                entities = curDbName.CapFileCollection.find(sqlwhere)
+                # app.logger.info("entities.count()=%d,entities2.count()=%d" % (entities.count(),entities2.count()))
+
+                strFileNo2 = entities2[0]['fileNo']
+                threshold = 45
+                if 'threshold' in entities2[0]:
+                    threshold = entities2[0]['threshold']
+                threshold = float(threshold)
+                bot.logic.get_adapters()[1].confidence_threshold = threshold / 100.0
+                # app.logger.info("相似阈值：%.1f" % threshold)
+
+                allCreate1 = datetime.today()
+                timeConsuming5 = allCreate1 - allCreate1
+                timeConsuming6 = timeConsuming5
+
+                totalCount = entities.count()  # 总记录数
+                # if totalCount > 4 :
+                #    totalCount = 4
+                for x in range(totalCount):
+                    create_at1 = datetime.today()
+                    huidaConfidenceSum = 0.0  # 相似字数乘以相似值
+                    questionLengthSum = 0.0  # 文件总字符数
+                    questionRowSum = 0  # 文件总行数
+                    huidaLengthSum = 0.0  # 匹配总字符数
+                    huidaRowSum = 0  # 匹配总行数
+                    entitiesMap = entities[x]
+                    serverFilename = entitiesMap['fileLocalUrl']
+                    # app.logger.info("serverFilename%s" % serverFilename)
+                    sqlwhere = {"fileID": entitiesMap['_id'], "fileNo2": strFileNo2}
+                    curDbName.ConfidenceDetail.remove(sqlwhere)
+                    sqlwhere = {"fileNo": entitiesMap['fileNo'], "fileNo2": strFileNo2}
+                    curDbName.ConfidenceResult.remove(sqlwhere)
+                    # update({"username":"111"},{"$pull":{"relationships":{"friends":"22"}}})
+                    sqlwhere = {'_id': ObjectId(entitiesMap['_id'])}
+                    sqlRTN = curDbName.CapFileCollection.update(sqlwhere,
+                                                                {"$pull": {"fileConfidence": {"fileNo2": strFileNo2}}})
+                    # app.logger.info(sqlRTN)
+                    #------------------------------------------------------------
+                    isInclude = 0  # 文件中是否包含对比字号 strFileNo2
+                    try:
+                        create_at61 = datetime.today()
+                        with open(serverFilename, mode='r', encoding='utf-8') as txtFile:
+                            allLines = txtFile.readlines()
+                            create_at62 = datetime.today()
+                            timeConsuming6 += (create_at62 - create_at61)
+                            isBreak = 0
+                            iFileConfidenceRowCount = 0
+                            i = 0
+                            for line in allLines:
+                                line = line.strip()
+                                line = line.replace(" ", "")
+                                if line.find(strFileNo2) >= 0:
+                                    app.logger.info("包含对比文件字号：%s" % strFileNo2)
+                                    isInclude = 1
+                                if (len(line) <= 4):
+                                    continue
+                                # app.logger.info(line)
+                                strSub = re.split('。|；', line)
+                                for question in strSub:
+                                    i += 1
+                                    question = question.strip()
+                                    # if (len(question) <= 2):
+                                    #    continue
+                                    if (len(question.encode()) <= 17):
+                                        # app.logger.info("question=%s,length=%d,length2=%d"%(question,len(question.encode()),len(question)))
+                                        continue
+                                    if question == "（此件公开发布）":
+                                        isBreak = 1
+                                        break
+                                    # 除掉 牵头
+                                    if patternQiantou.search(question) is not None:
+                                        app.logger.info("除掉 牵头：question=%s" % question)
+                                        continue
+                                    if patternFuze.search(question) is not None:
+                                        app.logger.info("除掉 负责：question=%s" % question)
+                                        continue
+                                    if i > 25 and iFileConfidenceRowCount == 0:  # 如果前25句中还没有一个相似就退出
+                                        isBreak = 1
+                                        break
+                                    create_at51 = datetime.today()
+                                    statementRes = bot.get_response(question)
+                                    create_at52 = datetime.today()
+                                    timeConsuming5 += (create_at52 - create_at51)
+                                    huida = statementRes.text
+                                    if patternQiantou.search(huida) is not None:
+                                        app.logger.info("除掉 牵头：huida=%s" % huida)
+                                        continue
+                                    if patternFuze.search(huida) is not None:
+                                        app.logger.info("除掉 负责：huida=%s" % huida)
+                                        continue
+
+                                    if strFileNo2 in huida:
+                                        app.logger.info("相同字号：strFileNo2=%s,huida=%s" % (strFileNo2, huida))
+                                        continue
+                                    questionLengthSum += len(question)
+                                    questionRowSum += 1
+                                    huidaConfidence = 0
+
+                                    if '对不起这个问题正在学习中20180308' == huida:
+                                        huida = huida.replace("对不起这个问题正在学习中20180308", "")
+                                    else:
+                                        if i < 25:
+                                            iFileConfidenceRowCount += 1
+
+                                        huidaConfidence = statementRes.confidence
+                                        huida = huida.replace("20180308", "")
+
+                                        if huida in weightData:
+                                            huidaConfidence = huidaConfidence * weightData[huida]
+                                            if huidaConfidence > 1:
+                                                huidaConfidence = 1
+                                            # app.logger.info("huidaConfidence=%f,weightData[huida]=%f" , huidaConfidence, weightData[huida])
+
+                                        huidaConfidenceSum += huidaConfidence * len(question)
+                                        huidaLengthSum += len(question)
+                                        huidaRowSum += 1
+
+                                    sqlInsert = {"fileID": entitiesMap['_id'], "fileNo": entitiesMap['fileNo'],
+                                                 "fileNo2": strFileNo2, "sentence": question,
+                                                 "sentenceConfidence": huida,
+                                                 "huidaConfidence": huidaConfidence * 100.0}
+                                    curDbName.ConfidenceDetail.insert_one(sqlInsert)
+                                if isBreak == 1:
+                                    break
+                                # app.logger.info("question=%s,huida=%s,huidaConfidence=%.2f" % (question,huida,huidaConfidence))
+
+
+                    except Exception:
+                        app.logger.info("产生例外的fileLocalUrl=%s" % serverFilename)
+                        continue
+
+                    if questionRowSum == 0 or questionLengthSum == 0:
+                        continue
+
+                    create_at2 = datetime.today()
+                    timeConsuming = create_at2 - create_at1
+                    # app.logger.info('耗时=%s,相似字数乘以相似值=%.2f,相似字数=%.2f,总字数=%.2f,相似语句数=%d,总语句数=%d,'
+                    #                '总加权相似比=%.2f,相似字占比=%.2f,相似语句占比=%.2f'%(timeConsuming,huidaConfidenceSum,huidaLengthSum,questionLengthSum,huidaRowSum,questionRowSum,
+                    #                huidaConfidenceSum/questionLengthSum*100.0,huidaLengthSum/questionLengthSum*100.0,huidaRowSum/questionRowSum*100.0))
+
+                    sqlInsert = {"huidaConfidenceSum": huidaConfidenceSum, "huidaLengthSum": huidaLengthSum,
+                                 "questionLengthSum": questionLengthSum,
+                                 "huidaRowSum": huidaRowSum, "questionRowSum": questionRowSum,
+                                 "statementConfidence": huidaConfidenceSum / questionLengthSum * 100.0,
+                                 "fileNo": entitiesMap['fileNo'], "fileNo2": strFileNo2, "isInclude": isInclude,
+                                 "timeConsuming": timeConsuming.seconds,
+                                 "createTime": strCreate_at}
+
+                        curDbName.ConfidenceResult.insert_one(sqlInsert)
+
+                    confidenceJson = {"fileNo2": strFileNo2,
+                                      "statementConfidence": huidaConfidenceSum / questionLengthSum * 100.0,
+                                      "isInclude": isInclude}
+                    sqlset2 = {'$push': {"fileConfidence": confidenceJson}}
+                    # sqlset = {'$set': confidenceJson}
+                    sqlwhere = {'_id': ObjectId(entitiesMap['_id'])}
+
+                    # curDbName.CapFileCollection.update(sqlwhere, sqlset)
+                    curDbName.CapFileCollection.update(sqlwhere, sqlset2)
+
+                    totalFileCount = totalFileCount + 1
+                    totalRowCount = totalRowCount + questionRowSum
+                    # app.logger.info('处理文件数=%d'%(totalFileCount))
+                allCreate2 = datetime.today()
+                app.logger.info('总耗时=%s,文件总数=%d,总行数=%d,总耗时5=%s,总耗时6=%s' % (
+                allCreate2 - allCreate1, totalFileCount, totalRowCount, timeConsuming5, timeConsuming6))
+
+'''

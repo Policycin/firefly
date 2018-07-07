@@ -3,9 +3,14 @@ from flask_wtf import FlaskForm
 from wtforms.validators import Required, Length, Email, DataRequired, ValidationError
 from pymongo import MongoClient
 from ..models import verify_password
+from app import app
+from config import DevelopmentConfig
 
-db = MongoClient().FireFly
-
+condev=DevelopmentConfig()
+mongoIP=condev.MONGOIP
+mongoPort=condev.MONGOPORT
+db=MongoClient(mongoIP,port=mongoPort)
+db = db.FireFly
 
 class LoginForm(FlaskForm):
     account = StringField(
@@ -465,3 +470,20 @@ class NoticeForm(FlaskForm):
 
         }
     )
+
+class CalForm(FlaskForm):
+    cmpfilename=StringField()
+    cmpfileNo=StringField()
+    soureFilename=StringField()
+    soureFileNo=StringField()
+    publisherCityName=StringField()
+    publishtime1=StringField()
+    publishtime2=StringField()
+
+    submit = SubmitField(
+        '开始对比',
+        render_kw={
+            'class': 'btn btn-primary',
+        }
+    )
+

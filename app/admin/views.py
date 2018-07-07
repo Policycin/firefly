@@ -1,6 +1,6 @@
 from . import admin
 from flask import render_template, redirect, url_for, flash, session, request
-from .forms import LoginForm, TagForm, PwdForm,SoureFileForm , CmpFileForm,NoticeForm
+from .forms import LoginForm, TagForm, PwdForm,SoureFileForm , CmpFileForm,NoticeForm ,CalForm
 from pymongo import MongoClient, DESCENDING
 from ..models import verify_password
 from flask_login import login_user, logout_user, login_required, current_user
@@ -8,9 +8,12 @@ import os, datetime, uuid
 from urllib.parse import urlencode, quote, unquote
 from bson.objectid import ObjectId
 from functools import wraps
+from config import DevelopmentConfig
 
-
-db = MongoClient('127.0.0.1', port=27017)
+condev=DevelopmentConfig()
+mongoIP=condev.MONGOIP
+mongoPort=condev.MONGOPORT
+db=MongoClient(mongoIP,port=mongoPort)
 db = db.FireFly
 
 @admin.context_processor
@@ -400,6 +403,15 @@ def notice_edit(id=None):
         flash("更新成功", 'ok')
         return redirect(url_for('admin.notice_edit', id=id))
     return render_template("admin/notice_edit.html", form=form, notice=notice)
+
+#相似度计算
+@admin.route('/botcal/<id>')
+def cal(id=None):
+    form = CalForm()
+    if form.validate_on_submit():
+        pass
+    return render_template('admin/bot_cal.html',form=form)
+
 
 
 
