@@ -49,7 +49,7 @@ with open(r"C:\\Users\\63163\\Desktop\\1.txt") as file:
         'url':'http://www.gov.cn/zhengce/content/2017-08/16/content_5218057.htm',
         'content':stre
     }
-    db.SoureFile.insert_one(content)
+    # db.SoureFile.insert_one(content)
 
 admin1 = {
     'username': 'admin',
@@ -62,3 +62,9 @@ admin1 = {
     'addtime': datetime.datetime.utcnow()
 }
 # db.Admin.insert_one(admin1)
+
+sourefile=[("请选择国发文号","请选择国发文号")]
+sourefilelist=db.SoureFile.find({})
+for v in sourefilelist:
+    sourefile.append((v['fileNo'],v['fileNo']))
+print(type(sourefile[1][0]))

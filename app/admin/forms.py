@@ -470,20 +470,86 @@ class NoticeForm(FlaskForm):
 
         }
     )
-
+sourefile=[("请选择国发文号","请选择国发文号")]
+sourefilelist=db.SoureFile.find({})
+for v in sourefilelist:
+    sourefile.append((v['fileNo'],v['fileNo']))
 class CalForm(FlaskForm):
-    cmpfilename=StringField()
-    cmpfileNo=StringField()
-    soureFilename=StringField()
-    soureFileNo=StringField()
-    publisherCityName=StringField()
-    publishtime1=StringField()
-    publishtime2=StringField()
-
+    # soureFilename=StringField()
+    # soureFileNo=SelectField(
+    #     label="国发文号",
+    #     validators=[
+    #         DataRequired('请选择国发文号！')
+    #     ],
+    #     description='国发文号',
+    #     coerce=str,
+    #     choices=sourefile,
+    #     render_kw={
+    #         "class": "form-control", "placeholder": "请选择国发文号！"
+    #     }
+    #
+    # )
+    cmpfilename=StringField(
+        label='文件标题',
+        validators=[
+            DataRequired("111")
+        ],
+        description='文件标题',
+        render_kw={
+            'class': "form-control", 'placeholder': "请输入标题！"
+        }
+    )
+    # cmpfileNo=StringField(
+    #     label='发文文号',
+    #     validators=[
+    #         DataRequired("222")
+    #     ],
+    #     description='发文文号',
+    #     render_kw={
+    #         'class': "form-control", 'placeholder': "请输入发文文号！"
+    #     }
+    # )
+    # publisherCityName=StringField(
+    #     label='城市名称',
+    #     validators=[
+    #         DataRequired("333")
+    #     ],
+    #     description='城市名称',
+    #     render_kw={
+    #         'class': "form-control", 'placeholder': "请输入城市名称！"
+    #     }
+    # )
+    # publishtime1=StringField(
+    #     label='开始日期',
+    #     validators=[
+    #         DataRequired("444")
+    #     ],
+    #     description='开始日期',
+    #     render_kw={
+    #         'class': "form-control", 'placeholder': "请选择开始日期！", "id": "input_release_time1"
+    #     }
+    # )
+    # publishtime2=StringField(
+    #     label='结束日期',
+    #     validators=[
+    #         DataRequired("555")
+    #     ],
+    #     description='结束日期',
+    #     render_kw={
+    #         'class': "form-control", 'placeholder': "请选择结束时间！", "id": "input_release_time2"
+    #     }
+    # )
     submit = SubmitField(
-        '开始对比',
+        '下一步',
         render_kw={
             'class': 'btn btn-primary',
         }
     )
+    # reset = SubmitField(
+    #     '重置',
+    #     render_kw={
+    #         'class': 'btn btn-primary',
+    #         'type':'reset'
+    #     }
+    # )
 

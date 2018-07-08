@@ -1,0 +1,126 @@
+{% extends 'admin/admin.html' %}
+{% block css %}
+{% endblock %}
+{% block content %}
+    <section class="content-header">
+        <h1>萤火虫：发现线索微光</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 相似度计算</a></li>
+            <li class="active">相似度计算</li>
+        </ol>
+    </section>
+    <section class="content" id="showcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">相似度计算</h3>
+                    </div>
+                    {% for msg in get_flashed_messages(category_filter=['ok']) %}
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-check"></i> 完成对比</h4>
+                            已完成相似度对比！
+                        </div>
+                    {% endfor %}
+                    {% for msg in get_flashed_messages(category_filter=['err']) %}
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-ban"></i>对比失败</h4>
+                            对比失败
+                        </div>
+                    {% endfor %}
+                                        {% for err in form.errors %}
+                                            {{ err }}
+                                        {% endfor %}
+                    <form role="form" method="" enctype="multipart/form-data" action="">
+                        <div class="box-body">
+{#                            <div class="form-group">#}
+{#                                <label for="input_title">{{ form.soureFileNo.label }}</label>#}
+{#                                {{ form.soureFileNo }}#}
+{#                                {% for err in form.soureFileNo.errors %}#}
+{#                                    <div class="col-md-12">#}
+{#                                        <font style="color;red">{{ err }}</font>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+                            <div class="form-group">
+                                <label for="input_url">{{ form.cmpfilename.label }}</label>
+                                {{ form.cmpfilename }}
+                                {% for err in form.cmpfilename.errors %}
+                                    <div class="col-md-12">
+                                        <font style="color;red">{{ err }}</font>
+                                    </div>
+                                {% endfor %}
+                            </div>
+{#                            <div class="form-group">#}
+{#                                <label for="input_info">{{ form.cmpfileNo.label }}</label>#}
+{#                                {{ form.cmpfileNo }}#}
+{#                                {% for err in form.cmpfileNo.errors %}#}
+{#                                    <div class="col-md-12">#}
+{#                                        <font style="color;red">{{ err }}</font>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                            <div class="form-group">#}
+{#                                <label for="input_info">{{ form.publisherCityName.label }}</label>#}
+{#                                {{ form.publisherCityName }}#}
+{#                                {% for err in form.publisherCityName.errors %}#}
+{#                                    <div class="col-md-12">#}
+{#                                        <font style="color;red">{{ err }}</font>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                            <div class="form-group">#}
+{#                                <label for="input_info">{{ form.publishtime1.label }}</label>#}
+{#                                {{ form.publishtime1 }}#}
+{#                                {% for err in form.publishtime1.errors %}#}
+{#                                    <div class="col-md-12">#}
+{#                                        <font style="color;red">{{ err }}</font>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                            <div class="form-group">#}
+{#                                <label for="input_info">{{ form.publishtime2.label }}</label>#}
+{#                                {{ form.publishtime2 }}#}
+{#                                {% for err in form.publishtime2.errors %}#}
+{#                                    <div class="col-md-12">#}
+{#                                        <font style="color;red">{{ err }}</font>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+
+                        </div>
+                        <div class="box-footer">
+                            {{ form.csrf_token }}
+                            {{ form.submit }}
+                            <button type="reset" class="btn btn-primary">重置</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('#input_release_time1').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd',
+            language: 'zh-CN',
+        });
+        $('#input_release_time2').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd',
+            language: 'zh-CN',
+        });
+    </script>
+        <script>
+        $(document).ready(function () {
+            $('#g-6').addClass('active')
+            $('#g-6-1').addClass('active')
+        });
+    </script>
+{% endblock %}

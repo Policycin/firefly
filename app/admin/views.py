@@ -405,12 +405,26 @@ def notice_edit(id=None):
     return render_template("admin/notice_edit.html", form=form, notice=notice)
 
 #相似度计算
-@admin.route('/botcal/<id>')
-def cal(id=None):
+@admin.route('/bot/search/',methods=["GET","POST"])
+def bot_search():
     form = CalForm()
+    print(form.validate_on_submit())
     if form.validate_on_submit():
-        pass
-    return render_template('admin/bot_cal.html',form=form)
+        data=form.data
+        print(data['sourefileNo'])
+        sourefile=db.SoureFile.find_one({"fileNo":data['sourefileNo']})
+        # print(sourefile)
+        redirect(url_for("admin.bot_search"))
+    print(form.errors)
+    return render_template('admin/bot_search.html',form=form)
+
+@admin.route('/botcal/<id>/<repositoryID>/<int:page>')
+def bot_cal(id=None,repositoryID=None,page=None):
+    if page==None:
+        page=1
+
+    return render_template("admin/bot_cal.html")
+
 
 
 
